@@ -1,0 +1,83 @@
+- To run fastapi
+uvicorn main:app --reload
+
+- To run sqlite
+sqlite3 todosapp.db
+continue with sql queries
+
+Project 1
+- introduces the CRUD methods using http
+
+Project 2
+- perform CRUD with classes and validation
+- Pydantics
+    - used for data modeling, data parsing and error handling, also used for validating POST data
+    - To activate:
+        - include "BaseModel" as the class parameter
+        - use Field(min_length= num, max_length= num) next to each field
+        - add Pydantics request into the method as parameter
+        ** will pass the ley/value from the Pydantics request into the constructor
+    - Path module (insert as method parameter)
+        - validates GET data for path endpoints
+        - eg. read_book(book_id: int = Path(gt=0)):
+    - Query module (insert as method parameter)
+        - validates GET data for query endpoints
+        - eg. read_book_by_rating(rating: int = Query(gt=0, lt=6)):
+    - HTTPException module (insert as decorator parameter)
+        - handles exception
+    - Status
+        - to show the exact status code on swagger.
+        - status code differs depending on situations
+Project 3
+- set up database, models. main
+- uvicorn main:app --reload
+- a db file should be generated in the folder
+- To create table:
+    - In the terminal, navigate to the file that contains the db file
+    - sqlite todos.db   # to initiate
+    - .schema           # to view table structure
+    - insert into todos(title, description, priority, complete) values ('Go to the store', 'Pick up eggs', 5, False);     #to insert values
+    - select * from todos   # to view data
+    - delete from todos where id = 4;
+    - .mode column  /   .mode markdown  /   .mode box   /   .mode table     #pick one for viewing layout
+- Whats new?
+    - Id that is made primary key will be automatically incremented by sqlachemy
+    - Session db needs to be passed into every method. eg (async def read_todo(db: db_dependency, todo_id: int = Path(gt=0)):)
+    - For get method, include a db model for filtering and checking
+    - For post method, must include a db model, then db.add(todo_model) and db.commit()
+    - For put method, combine get and post instructions
+    - For delete method, combine get and post then use .delete() function
+- User Authentication
+    - set up a auth file in a different folder for user authentication, user APIRouter to share the same port as main.py by using app.include()
+    - copy everything from main.py and past in todos.py, change "app" to "router", delete everything in main.py that is copied to todos
+    - OAuth2PasswordRequestForm to create a form on swagger to verify users name and password
+    - Apply the 2 line of code below in every api endpoints to make sure user can only see their own stuff:
+        - if user is None: raise HTTPException(status_code=401, detail="Authentication Failed")
+        - .filter(Todos.owner_id == user.get("id"))
+- Password hashing
+    - pip install passlib
+    - pip install bcrypt==4.0.1
+- Using JWT (Json Web Token) to authorize data access between server and client (Encoding & Decoding)
+    - JWT is a string of characters that when decoded shows information of server and user
+    - pip install "python-jose[cryptography]"   # to install jose library
+    - openssl rand -hex 32                      # to generate a random string of 32 bit for secret key
+- Alembic
+    - used for adding columns / make changes to tables without having to delete the table
+    - aka a database migration tool that allows modification of database schemes
+    - to install: pip install alembic
+    - commands : alembic init <folder name> , alembic revision -m <message>, alembic upgrade <revision #>, alembic downgrade -1
+    - a new upgrade method needs to be created in order to add a column
+    - downgrade to used to revert the database to remove the last migration
+ - Unit, integration testing
+    - manual testing : like what we do
+    - unit testing : pytest framework : automate unit testing , use of assert() to check assertion (statement that checks if a condition is true)
+    - integration testing : testing the interaction between different units or components (eg. call an API endpoint and make sure the correct solution is returned)
+    - getting started:
+        -   tests must be inside a file named 'test' because pytest looks for it specifically
+        -
+  - DOM manipulation
+
+
+** One to many relationship
+    - The table that has the FK represents the "many"
+    eg. Todos table has the FK that references User id (primary key), then Todos table is "many", so a user can have many Todos
